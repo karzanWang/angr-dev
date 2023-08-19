@@ -24,7 +24,8 @@ def load_commits(repo):
     timestamp_commits = { }
     commit_versions = { }
     commit_timestamps = { }
-    for commit in sh.git('-C', repo, 'log', '--pretty=%H|%ct|%s', _tty_out=False): #pylint:disable=no-member
+    commits = sh.git('-C', repo, 'log', '--pretty=format:\"%H|%ct|%s\"', _tty_out=False).replace("\"", "").split("\n")
+    for commit in commits: #pylint:disable=no-member
         commit_hash, timestamp, comment = commit.strip().split('|', 2)
         timestamp = int(timestamp)
         timestamp_commits[timestamp] = commit_hash
@@ -61,6 +62,7 @@ if __name__ == '__main__':
 
     if len(sys.argv[1]) == 40:
         # we're synchronizing to a commit
+        print(all_commit_timestamps.keys())
         _timestamp = all_commit_timestamps[sys.argv[1]]
         for _r in list(all_repos):
             checkout_latest(_r, _timestamp)
